@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pymes_app/endpoints.dart';
 import 'package:pymes_app/widgets/appBar.dart';
 import 'package:pymes_app/widgets/basicInput.dart';
 import 'package:pymes_app/widgets/tittle.dart';
@@ -62,24 +63,37 @@ class _CreateClientState extends State<CreateClient> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         BasicButton(
-                          text: 'Crear cliente',
-                          onclick: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CreateClient()));
-                          },
-                        ),
-                        BasicButton(
                           text: 'Cancelar',
                           redButton: true,
                           onclick: () {
                             Navigator.pop(context);
                           },
                         ),
+                        BasicButton(
+                          text: 'Crear cliente',
+                          onclick: () {
+                            cilentCreate();
+                          },
+                        ),
                       ],
                     )))
           ],
         ));
+  }
+
+  cilentCreate() async {
+    if (nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          AppConfig().showSnack('Agrega el nombre de tu cliente', 3));
+    } else {
+      bool success = await Endpoints()
+          .createClient(name: nameController.text, phone: phoneController.text);
+      if (success) {
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(AppConfig().showSnack('Algo salió mal', 3));
+      }
+    }
   }
 }

@@ -48,7 +48,7 @@ class ClientCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
-            child: Text('$clientDebt Gs'),
+            child: Text(clientDebt),
           )
         ]),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pymes_app/pages/clientList.dart';
 import 'package:pymes_app/pages/login.dart';
+import 'package:pymes_app/pages/splashScreen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Login(),
+      home: const SplashScreen(),
     );
   }
 }

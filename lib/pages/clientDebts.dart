@@ -27,18 +27,28 @@ class _ClientDebtsState extends State<ClientDebts> {
         children: [
           Column(
             children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.05,
-                color: AppConfig().secundaryColor,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const [Text('Nueva deduda'), Text('12/21/2003')],
-                ),
-              ),
+              // Container(
+              //   height: MediaQuery.of(context).size.height * 0.05,
+              //   color: AppConfig().secundaryColor,
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //     children: const [Text('Registros'), Text('12/21/2003')],
+              //   ),
+              // ),
+
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.75,
+                height: MediaQuery.of(context).size.height * 0.8,
                 child: ListView(
-                  children: [for (var i = 0; i < 10; i++) const DebtCard()],
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        'Registros',
+                        style: TextStyle(fontSize: 27),
+                      ),
+                    ),
+                    for (var i = 0; i < 10; i++) const DebtCard()
+                  ],
                 ),
               )
             ],
