@@ -3,7 +3,17 @@ import 'package:flutter/material.dart';
 import '../appConfig.dart';
 
 class DebtCard extends StatelessWidget {
-  const DebtCard({super.key});
+  final String details;
+  final String total;
+  final String date;
+  final bool isPay;
+  const DebtCard({
+    super.key,
+    required this.date,
+    required this.details,
+    required this.total,
+    required this.isPay,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +24,11 @@ class DebtCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        gradient: isPay
+            ? LinearGradient(
+                stops: const [0.02, 0.02],
+                colors: [AppConfig().succesColor, Colors.white])
+            : null,
         boxShadow: [
           BoxShadow(
             color: AppConfig().shadowColor,
@@ -33,16 +48,14 @@ class DebtCard extends StatelessWidget {
               Container(
                   padding: const EdgeInsets.only(bottom: 10),
                   width: MediaQuery.of(context).size.width * 0.6,
-                  child: const Text(
-                      'estos son algunos de los productos de la deuda')),
-              const Text(
-                '12/21/1212',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(details)),
+              Text(
+                date,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               )
             ],
           ),
-          const Text('120.000 Gs',
-              style: TextStyle(fontWeight: FontWeight.bold))
+          Text(total, style: const TextStyle(fontWeight: FontWeight.bold))
         ],
       ),
     );

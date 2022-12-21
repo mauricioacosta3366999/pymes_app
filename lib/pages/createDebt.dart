@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pymes_app/endpoints.dart';
 import 'package:pymes_app/models/createDebtModel.dart';
+import 'package:pymes_app/models/debtsListModel.dart';
+import 'package:pymes_app/pages/clientDebts.dart';
 import 'package:pymes_app/widgets/basicInput.dart';
 import 'package:pymes_app/widgets/newDebtCard.dart';
 
@@ -8,7 +11,10 @@ import '../widgets/appBar.dart';
 import '../widgets/basicButton.dart';
 
 class CreateDebt extends StatefulWidget {
-  const CreateDebt({super.key});
+  final String clientId;
+  final String clienName;
+  const CreateDebt(
+      {super.key, required this.clientId, required this.clienName});
 
   @override
   State<CreateDebt> createState() => _CreateDebtState();
@@ -19,6 +25,7 @@ class _CreateDebtState extends State<CreateDebt> {
   var priceController = TextEditingController();
   List<CreateDebtModel> debtList = [];
   int totalPrice = 0;
+  bool loading = false;
 
   addNewProduct() {
     if (dataValidation()) {
@@ -50,6 +57,28 @@ class _CreateDebtState extends State<CreateDebt> {
     setState(() {});
   }
 
+  debtRegister() async {
+    if (debtList.isNotEmpty) {
+      setState(() => loading = true);
+      String m = '';
+      if (debtList.length > 1) {
+        for (var i = 0; i < debtList.length; i++) {
+          String n = debtList[i].productName;
+          m = '$n, $m';
+        }
+      } else if (debtList.length == 1) {
+        m = debtList[0].productName;
+      }
+      DebtsListModel newData = await Endpoints().debtRegister(
+          details: m, total: totalPrice, clientId: widget.clientId);
+      print(newData);
+      setState(() => loading = false);
+      if (newData.id != null) {
+        Navigator.pop(context, newData);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,11 +95,14 @@ class _CreateDebtState extends State<CreateDebt> {
                 color: AppConfig().secundaryColor,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const [Text('Nueva Deuda'), Text('08/14/2001')],
+                  children: [
+                    const Text('Nueva Deuda'),
+                    Text(AppConfig().dateFormat(date: DateTime.now()))
+                  ],
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
+                // margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -116,7 +148,9 @@ class _CreateDebtState extends State<CreateDebt> {
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.63,
+                height: WidgetsBinding.instance.window.viewInsets.bottom > 0.0
+                    ? MediaQuery.of(context).size.height * 0.37
+                    : MediaQuery.of(context).size.height * 0.62,
                 child: ListView(
                   children: [
                     for (var i = 0; i < debtList.length; i++)
@@ -136,32 +170,39 @@ class _CreateDebtState extends State<CreateDebt> {
               bottom: 0,
               child: Container(
                   alignment: Alignment.center,
-                  height: MediaQuery.of(context).size.height * 0.07,
+                  height: MediaQuery.of(context).size.height * 0.1,
                   width: MediaQuery.of(context).size.width,
-                  color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        height: 50,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Text('$totalPrice Gs'),
-                      ),
-                      BasicButton(
-                        text: 'Registrar deuda total',
-                        onclick: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateDebt()));
-                        },
-                      ),
-                    ],
-                  )))
+                  color: AppConfig().secundaryColor,
+                  child: loading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child:
+                                  Text(AppConfig().currencyFormat(totalPrice)),
+                            ),
+                            BasicButton(
+                              text: 'Registrar deuda total',
+                              onclick: () {
+                                debtRegister();
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => CreateDebt()));
+                              },
+                            ),
+                          ],
+                        )))
         ],
       ),
     );

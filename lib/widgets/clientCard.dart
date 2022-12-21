@@ -5,9 +5,13 @@ import '../appConfig.dart';
 
 class ClientCard extends StatelessWidget {
   final String clientName;
-  final String clientDebt;
+  final String clientId;
+  final String clientTotalDebt;
   const ClientCard(
-      {super.key, required this.clientName, required this.clientDebt});
+      {super.key,
+      required this.clientName,
+      required this.clientId,
+      required this.clientTotalDebt});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +20,9 @@ class ClientCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const ClientDebts(
-                      clientName: 'Alfredo',
+                builder: (context) => ClientDebts(
+                      clientName: clientName,
+                      clientId: clientId,
                     )));
       },
       child: Container(
@@ -48,7 +53,7 @@ class ClientCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
-            child: Text(clientDebt),
+            child: Text(clientTotalDebt),
           )
         ]),
       ),

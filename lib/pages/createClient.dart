@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pymes_app/endpoints.dart';
+import 'package:pymes_app/pages/clientList.dart';
 import 'package:pymes_app/widgets/appBar.dart';
 import 'package:pymes_app/widgets/basicInput.dart';
 import 'package:pymes_app/widgets/tittle.dart';
@@ -17,6 +18,7 @@ class CreateClient extends StatefulWidget {
 class _CreateClientState extends State<CreateClient> {
   var nameController = TextEditingController();
   var phoneController = TextEditingController();
+  bool loading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,25 +60,27 @@ class _CreateClientState extends State<CreateClient> {
                     alignment: Alignment.center,
                     height: MediaQuery.of(context).size.height * 0.1,
                     width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        BasicButton(
-                          text: 'Cancelar',
-                          redButton: true,
-                          onclick: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        BasicButton(
-                          text: 'Crear cliente',
-                          onclick: () {
-                            cilentCreate();
-                          },
-                        ),
-                      ],
-                    )))
+                    color: AppConfig().secundaryColor,
+                    child: loading
+                        ? const CircularProgressIndicator()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              BasicButton(
+                                text: 'Cancelar',
+                                redButton: true,
+                                onclick: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              BasicButton(
+                                text: 'Crear cliente',
+                                onclick: () {
+                                  cilentCreate();
+                                },
+                              ),
+                            ],
+                          )))
           ],
         ));
   }
@@ -86,10 +90,13 @@ class _CreateClientState extends State<CreateClient> {
       ScaffoldMessenger.of(context).showSnackBar(
           AppConfig().showSnack('Agrega el nombre de tu cliente', 3));
     } else {
+      setState(() => loading = true);
       bool success = await Endpoints()
           .createClient(name: nameController.text, phone: phoneController.text);
+      setState(() => loading = false);
       if (success) {
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ClientListPage()));
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(AppConfig().showSnack('Algo salió mal', 3));

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pymes_app/endpoints.dart';
+import 'package:pymes_app/models/debtsListModel.dart';
 import 'package:pymes_app/pages/createDebt.dart';
 import 'package:pymes_app/pages/newPay.dart';
 import 'package:pymes_app/widgets/debtCard.dart';
@@ -8,14 +10,32 @@ import '../widgets/appBar.dart';
 import '../widgets/basicButton.dart';
 
 class ClientDebts extends StatefulWidget {
+  final String clientId;
   final String clientName;
-  const ClientDebts({super.key, required this.clientName});
+  const ClientDebts(
+      {super.key, required this.clientName, required this.clientId});
 
   @override
   State<ClientDebts> createState() => _ClientDebtsState();
 }
 
 class _ClientDebtsState extends State<ClientDebts> {
+  List<DebtsListModel> debtsLIst = [];
+  bool loading = true;
+  DebtsListModel newData = DebtsListModel();
+
+  @override
+  void initState() {
+    getClientDebts();
+    super.initState();
+  }
+
+  getClientDebts() async {
+    setState(() => loading = true);
+    debtsLIst = await Endpoints().getClientDebtsList(clientId: widget.clientId);
+    setState(() => loading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,71 +43,89 @@ class _ClientDebtsState extends State<ClientDebts> {
           preferredSize:
               Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
           child: MyAppBar(tittle: widget.clientName)),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // Container(
-              //   height: MediaQuery.of(context).size.height * 0.05,
-              //   color: AppConfig().secundaryColor,
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //     children: const [Text('Registros'), Text('12/21/2003')],
-              //   ),
-              // ),
-
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: ListView(
+      body: loading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: AppConfig().secundaryColor,
+              ),
+            )
+          : Stack(
+              children: [
+                Column(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                        'Registros',
-                        style: TextStyle(fontSize: 27),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: ListView(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Text(
+                              'Registros',
+                              style: TextStyle(fontSize: 27),
+                            ),
+                          ),
+                          for (var i = 0; i < debtsLIst.length; i++)
+                            DebtCard(
+                              isPay: debtsLIst[i].details == 'Pago agregado'
+                                  ? true
+                                  : false,
+                              date: AppConfig()
+                                  .dateFormat(date: debtsLIst[i].created!),
+                              details: debtsLIst[i].details!,
+                              total: AppConfig()
+                                  .currencyFormat(debtsLIst[i].total!),
+                            )
+                        ],
                       ),
-                    ),
-                    for (var i = 0; i < 10; i++) const DebtCard()
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
-          Positioned(
-              bottom: 0,
-              child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  alignment: Alignment.center,
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      BasicButton(
-                        text: 'Nuevo abono',
-                        onclick: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NewPay(
-                                        clientName: 'cliente Name',
-                                      )));
-                        },
-                      ),
-                      BasicButton(
-                        text: 'Nueva deuda',
-                        onclick: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CreateDebt()));
-                        },
-                      ),
-                    ],
-                  )))
-        ],
-      ),
+                Positioned(
+                    bottom: 0,
+                    child: Container(
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height * 0.09,
+                        width: MediaQuery.of(context).size.width,
+                        color: AppConfig().secundaryColor,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            BasicButton(
+                              text: 'Agregar pago',
+                              onclick: () {
+                                getNewData(true);
+                              },
+                            ),
+                            BasicButton(
+                              text: 'Agregar deuda',
+                              onclick: () async {
+                                getNewData(false);
+                              },
+                            ),
+                          ],
+                        )))
+              ],
+            ),
     );
+  }
+
+  getNewData(bool isPay) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => isPay
+                ? NewPay(
+                    clientName: widget.clientName,
+                    clientId: widget.clientId,
+                  )
+                : CreateDebt(
+                    clientId: widget.clientId,
+                    clienName: widget.clientName,
+                  ))).then((value) {
+      if (value != null) {
+        debtsLIst.add(value);
+        setState(() {});
+      }
+    });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pymes_app/models/clientListModel.dart';
+import 'package:pymes_app/models/debtsListModel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -46,6 +47,21 @@ class Endpoints {
     }
   }
 
+  getClientDebtsList({required String clientId}) async {
+    try {
+      var response = await supabaseClient
+          .from('Debts')
+          .select('*')
+          .eq('clientid', clientId);
+      var debtslist = (response as List<dynamic>)
+          .map((e) => DebtsListModel.fromJson(e))
+          .toList();
+      return debtslist;
+    } catch (e) {
+      return [];
+    }
+  }
+
   createClient({required String name, required String phone}) async {
     try {
       var id = await storage.read(key: 'pymeId');
@@ -57,6 +73,21 @@ class Endpoints {
     } catch (e) {
       print(e);
       return false;
+    }
+  }
+
+  debtRegister(
+      {required String details,
+      required int total,
+      required String clientId}) async {
+    try {
+      var response = await supabaseClient.from('Debts').insert(
+          {'details': details, 'total': total, 'clientid': clientId}).select();
+      DebtsListModel model = DebtsListModel.fromJson(response[0]);
+      print(model);
+      return model;
+    } catch (e) {
+      print(e);
     }
   }
 }

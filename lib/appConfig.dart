@@ -24,6 +24,11 @@ class AppConfig {
     );
   }
 
+  dateFormat({required DateTime date}) {
+    final df = DateFormat('dd-MM-yyyy hh:mm a');
+    return df.format(date);
+  }
+
   currencyFormat(int value) {
     var formatter = NumberFormat.decimalPattern();
     String priceFormated = formatter.format(value).replaceAll(',', '.');

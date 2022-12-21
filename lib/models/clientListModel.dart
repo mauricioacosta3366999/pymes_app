@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final clientListModel = clientListModelFromJson(jsonString);
-
 import 'dart:convert';
 
 ClientListModel clientListModelFromJson(String str) =>
@@ -12,12 +8,14 @@ String clientListModelToJson(ClientListModel data) =>
 
 class ClientListModel {
   ClientListModel({
+    this.id,
     this.name,
     this.phone,
     this.pymeId,
     this.total,
   });
 
+  String? id;
   String? name;
   String? phone;
   String? pymeId;
@@ -25,6 +23,7 @@ class ClientListModel {
 
   factory ClientListModel.fromJson(Map<String, dynamic> json) =>
       ClientListModel(
+        id: json["id"],
         name: json["name"],
         phone: json["phone"],
         pymeId: json["pymeId"],
@@ -32,6 +31,7 @@ class ClientListModel {
       );
 
   Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "phone": phone,
         "pymeId": pymeId,

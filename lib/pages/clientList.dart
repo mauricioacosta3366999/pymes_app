@@ -86,7 +86,8 @@ class _ClientListPageState extends State<ClientListPage> {
                             for (var i = 0; i < clientList.length; i++)
                               ClientCard(
                                 clientName: clientList[i].name!,
-                                clientDebt: AppConfig()
+                                clientId: clientList[i].id!,
+                                clientTotalDebt: AppConfig()
                                     .currencyFormat(clientList[i].total!),
                               )
                           ],
@@ -99,7 +100,7 @@ class _ClientListPageState extends State<ClientListPage> {
                     bottom: 0,
                     child: Container(
                         alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.07,
+                        height: MediaQuery.of(context).size.height * 0.1,
                         width: MediaQuery.of(context).size.width,
                         color: AppConfig().secundaryColor,
                         child: BasicButton(
