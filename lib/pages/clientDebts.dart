@@ -57,15 +57,20 @@ class _ClientDebtsState extends State<ClientDebts> {
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: ListView(
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.all(20),
+                          Padding(
+                            padding: const EdgeInsets.all(20),
                             child: Text(
-                              'Registros',
-                              style: TextStyle(fontSize: 27),
+                              debtsLIst.isEmpty
+                                  ? 'No tiene registros'
+                                  : 'Registros',
+                              style: const TextStyle(fontSize: 27),
                             ),
                           ),
                           for (var i = 0; i < debtsLIst.length; i++)
                             DebtCard(
+                              clientId: widget.clientId,
+                              clientName: widget.clientName,
+                              id: debtsLIst[i].id!,
                               isPay: debtsLIst[i].details == 'Pago agregado'
                                   ? true
                                   : false,

@@ -91,11 +91,23 @@ class _NewPayState extends State<NewPay> {
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : BasicButton(
-                          text: 'Registrar pago',
-                          onclick: () {
-                            payRegister();
-                          },
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            BasicButton(
+                              text: 'Cancelar',
+                              redButton: true,
+                              onclick: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            BasicButton(
+                              text: 'Registrar pago',
+                              onclick: () {
+                                payRegister();
+                              },
+                            ),
+                          ],
                         )))
         ],
       ),

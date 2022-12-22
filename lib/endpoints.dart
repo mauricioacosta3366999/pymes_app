@@ -39,10 +39,8 @@ class Endpoints {
       var clientList = (response as List<dynamic>)
           .map((e) => ClientListModel.fromJson(e))
           .toList();
-      print(clientList);
       return clientList;
     } catch (e) {
-      print(e);
       return [];
     }
   }
@@ -65,13 +63,31 @@ class Endpoints {
   createClient({required String name, required String phone}) async {
     try {
       var id = await storage.read(key: 'pymeId');
-      var response = await supabaseClient
+      await supabaseClient
           .from('Clients')
           .insert({'name': name, 'phone': phone, 'pymeId': id, 'total': 0});
-      print(response);
       return true;
     } catch (e) {
-      print(e);
+      return false;
+    }
+  }
+
+  editDebt(
+      {required String details, required int total, required String id}) async {
+    try {
+      await supabaseClient.from('Debts').update(
+          {'details': details, 'total': total}).match({'id': id}).select();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  deleteDebt({required String id}) async {
+    try {
+      await supabaseClient.from('Debts').delete().match({'id': id});
+      return true;
+    } catch (e) {
       return false;
     }
   }
@@ -84,10 +100,9 @@ class Endpoints {
       var response = await supabaseClient.from('Debts').insert(
           {'details': details, 'total': total, 'clientid': clientId}).select();
       DebtsListModel model = DebtsListModel.fromJson(response[0]);
-      print(model);
       return model;
     } catch (e) {
-      print(e);
+      return DebtsListModel();
     }
   }
 }
