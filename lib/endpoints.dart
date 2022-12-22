@@ -92,6 +92,15 @@ class Endpoints {
     }
   }
 
+  deleteAllDebts({required String id}) async {
+    try {
+      await supabaseClient.from('Debts').delete().match({'clientid': id});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   debtRegister(
       {required String details,
       required int total,

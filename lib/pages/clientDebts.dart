@@ -23,10 +23,12 @@ class _ClientDebtsState extends State<ClientDebts> {
   List<DebtsListModel> debtsLIst = [];
   bool loading = true;
   DebtsListModel newData = DebtsListModel();
+  int allDeude = 0;
 
   @override
   void initState() {
     getClientDebts();
+    // getTotalDeude();
     super.initState();
   }
 
@@ -34,6 +36,36 @@ class _ClientDebtsState extends State<ClientDebts> {
     setState(() => loading = true);
     debtsLIst = await Endpoints().getClientDebtsList(clientId: widget.clientId);
     setState(() => loading = false);
+    getTotalDeude();
+  }
+
+  getTotalDeude() {
+    allDeude = 0;
+    for (var i = 0; i < debtsLIst.length; i++) {
+      if (debtsLIst[i].details == 'Pago agregado') {
+        allDeude = allDeude - debtsLIst[i].total!;
+      } else {
+        allDeude = allDeude + debtsLIst[i].total!;
+      }
+    }
+    setState(() {});
+  }
+
+  getActualDebt() {
+    if (allDeude == 0) {
+      return 'Deudas pagadas';
+    } else {
+      return AppConfig().currencyFormat(allDeude);
+    }
+  }
+
+  emptyDebts() async {
+    setState(() => loading = true);
+    bool success = await Endpoints().deleteAllDebts(id: widget.clientId);
+    setState(() => loading = false);
+    if (success) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -58,7 +90,8 @@ class _ClientDebtsState extends State<ClientDebts> {
                       child: ListView(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.only(
+                                top: 20, left: 20, right: 20),
                             child: Text(
                               debtsLIst.isEmpty
                                   ? 'No tiene registros'
@@ -66,6 +99,28 @@ class _ClientDebtsState extends State<ClientDebts> {
                               style: const TextStyle(fontSize: 27),
                             ),
                           ),
+                          debtsLIst.isNotEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Text(
+                                    getActualDebt(),
+                                    textAlign: TextAlign.right,
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                )
+                              : Container(),
+                          if (allDeude <= 0 && debtsLIst.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  vertical: 20),
+                              child: BasicButton(
+                                  onclick: () {
+                                    emptyDebts();
+                                  },
+                                  text: 'vacíar registros'),
+                            ),
                           for (var i = 0; i < debtsLIst.length; i++)
                             DebtCard(
                               clientId: widget.clientId,
@@ -129,6 +184,7 @@ class _ClientDebtsState extends State<ClientDebts> {
                   ))).then((value) {
       if (value != null) {
         debtsLIst.add(value);
+        getTotalDeude();
         setState(() {});
       }
     });
