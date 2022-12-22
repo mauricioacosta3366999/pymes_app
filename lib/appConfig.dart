@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AppConfig {
+  final pymeName = 'La Esperanza';
   final prymaryColor = const Color(0xff005439);
   final secundaryColor = Color.fromARGB(88, 0, 146, 112);
   final succesColor = const Color(0xffCFECCF);

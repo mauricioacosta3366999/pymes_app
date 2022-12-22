@@ -9,11 +9,13 @@ class BasicInput extends StatefulWidget {
   final String text;
   final TextInputType? inputType;
   final bool? needcurrencyFormat;
+  final Function? onChange;
   const BasicInput(
       {super.key,
       required this.controller,
       required this.icon,
       required this.text,
+      this.onChange,
       this.inputType,
       this.needcurrencyFormat});
 
@@ -38,6 +40,11 @@ class _BasicInputState extends State<BasicInput> {
         ],
       ),
       child: TextFormField(
+        onChanged: widget.onChange == null
+            ? null
+            : (value) {
+                widget.onChange!();
+              },
         controller: widget.controller,
         keyboardType: widget.inputType,
         inputFormatters: widget.needcurrencyFormat == true

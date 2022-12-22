@@ -6,12 +6,11 @@ import '../appConfig.dart';
 class ClientCard extends StatelessWidget {
   final String clientName;
   final String clientId;
-  final String clientTotalDebt;
-  const ClientCard(
-      {super.key,
-      required this.clientName,
-      required this.clientId,
-      required this.clientTotalDebt});
+  const ClientCard({
+    super.key,
+    required this.clientName,
+    required this.clientId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +50,23 @@ class ClientCard extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.6,
             child: Text(clientName),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Text(clientTotalDebt),
+          Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(0),
+                child: Icon(
+                  Icons.phone,
+                  color: AppConfig().prymaryColor,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(
+                  Icons.whatsapp,
+                  color: AppConfig().prymaryColor,
+                ),
+              )
+            ],
           )
         ]),
       ),

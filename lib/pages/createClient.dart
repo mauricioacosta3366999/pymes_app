@@ -25,7 +25,7 @@ class _CreateClientState extends State<CreateClient> {
         appBar: PreferredSize(
             preferredSize:
                 Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
-            child: const MyAppBar(tittle: 'Empresa S.A.')),
+            child: MyAppBar(tittle: AppConfig().pymeName)),
         body: Stack(
           children: [
             Column(
@@ -47,6 +47,7 @@ class _CreateClientState extends State<CreateClient> {
                   height: MediaQuery.of(context).size.height * 0.15,
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: BasicInput(
+                    inputType: TextInputType.number,
                     controller: phoneController,
                     icon: const Icon(Icons.phone),
                     text: 'telefono',
@@ -95,8 +96,9 @@ class _CreateClientState extends State<CreateClient> {
           .createClient(name: nameController.text, phone: phoneController.text);
       setState(() => loading = false);
       if (success) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => ClientListPage()));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const ClientListPage()),
+            (Route<dynamic> route) => false);
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(AppConfig().showSnack('Algo salió mal', 3));

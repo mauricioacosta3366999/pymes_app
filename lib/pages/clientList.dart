@@ -19,8 +19,9 @@ class ClientListPage extends StatefulWidget {
 class _ClientListPageState extends State<ClientListPage> {
   var searcherController = TextEditingController();
   List<ClientListModel> clientList = [];
+  List<ClientListModel> searcherClientList = [];
   bool loading = false;
-  int allDeude = 0;
+  bool userSearchList = false;
 
   @override
   void initState() {
@@ -31,13 +32,21 @@ class _ClientListPageState extends State<ClientListPage> {
   getClients() async {
     setState(() => loading = true);
     clientList = await Endpoints().getClientList();
+    searcherClientList = clientList;
     setState(() => loading = false);
-    getTotalDeude();
   }
 
-  getTotalDeude() {
-    for (var i = 0; i < clientList.length; i++) {
-      allDeude = allDeude + clientList[i].total!;
+  searcher() async {
+    if (searcherController.text.isEmpty) {
+      setState(() => userSearchList = false);
+    } else {
+      searcherClientList = [];
+      setState(() => userSearchList = true);
+      for (var i = 0; i < clientList.length; i++) {
+        if (clientList[i].name!.contains(searcherController.text)) {
+          searcherClientList.add(clientList[i]);
+        }
+      }
     }
     setState(() {});
   }
@@ -49,7 +58,7 @@ class _ClientListPageState extends State<ClientListPage> {
       appBar: PreferredSize(
           preferredSize:
               Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
-          child: const MyAppBar(tittle: 'Empresa S.A.')),
+          child: MyAppBar(tittle: AppConfig().pymeName)),
       body: loading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -60,39 +69,44 @@ class _ClientListPageState extends State<ClientListPage> {
                   child: Column(
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.05,
-                        color: AppConfig().secundaryColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            const Text('Monto a cobrar: '),
-                            Text(AppConfig().currencyFormat(allDeude))
-                          ],
-                        ),
-                      ),
-                      Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.1,
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: BasicInput(
+                            onChange: () {
+                              searcher();
+                            },
                             controller: searcherController,
                             icon: const Icon(Icons.search),
                             text: 'Buscar cliente'),
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.9,
-                        child: ListView(
-                          children: [
-                            for (var i = 0; i < clientList.length; i++)
-                              ClientCard(
-                                clientName: clientList[i].name!,
-                                clientId: clientList[i].id!,
-                                clientTotalDebt: AppConfig()
-                                    .currencyFormat(clientList[i].total!),
-                              )
-                          ],
-                        ),
-                      ),
+                      userSearchList
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.9,
+                              child: ListView(
+                                children: [
+                                  for (var i = 0;
+                                      i < searcherClientList.length;
+                                      i++)
+                                    ClientCard(
+                                      clientName: searcherClientList[i].name!,
+                                      clientId: searcherClientList[i].id!,
+                                    )
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.9,
+                              child: ListView(
+                                children: [
+                                  for (var i = 0; i < clientList.length; i++)
+                                    ClientCard(
+                                      clientName: clientList[i].name!,
+                                      clientId: clientList[i].id!,
+                                    )
+                                ],
+                              ),
+                            ),
                     ],
                   ),
                 ),
