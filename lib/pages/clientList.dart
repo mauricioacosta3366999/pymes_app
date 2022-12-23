@@ -89,6 +89,7 @@ class _ClientListPageState extends State<ClientListPage> {
                                       i < searcherClientList.length;
                                       i++)
                                     ClientCard(
+                                      phone: searcherClientList[i].phone!,
                                       clientName: searcherClientList[i].name!,
                                       clientId: searcherClientList[i].id!,
                                     )
@@ -101,6 +102,7 @@ class _ClientListPageState extends State<ClientListPage> {
                                 children: [
                                   for (var i = 0; i < clientList.length; i++)
                                     ClientCard(
+                                      phone: searcherClientList[i].phone!,
                                       clientName: clientList[i].name!,
                                       clientId: clientList[i].id!,
                                     )
